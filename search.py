@@ -82,24 +82,15 @@ class Node:
         self.prev = prev
 
 
-def make_initial_node(state):
-    """Make the initial node of searching"""
+def init_node(state):
     return Node(state, None, 0, None)
 
 
-def make_succ_node(current_node, succ):
-    """
-    Make the successor node given the current node
-    and succ as a dictionary obtained from problem.GetSuccessors
-    """
-    return Node(succ[0], succ[1], succ[2], current_node)
+def make_successor_node(current_node, successor):
+    return Node(successor[0], successor[1], successor[2], current_node)
 
 
-def getActionList(node):
-    """
-    Get the sequence of actions from the
-    beginning of the problem to the current node
-    """
+def get_actions(node):
     actions = []
     while node.prev:
         actions.append(node.action)
@@ -108,18 +99,12 @@ def getActionList(node):
 
 
 def search(problem, init, expand):
-    """
-    Perform a search algorithm with shared logic,
-    it calls init function to initialise data structure for open list,
-    and calls expand function to expand the current node and update the
-    data structure accordingly
-    """
     closed = set()
     opened = init()
     while not opened.isEmpty():
         node = opened.pop()
         if problem.isGoalState(node.state):
-            return getActionList(node)
+            return get_actions(node)
         if node.state not in closed:
             closed.add(node.state)
             expand(node, opened)
@@ -139,18 +124,22 @@ def depthFirstSearch(problem):
     print "Start:", problem.getStartState()
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
+
+    Start: (5, 5)
+    Is the start a goal? False
+    Start 's successors: [((5, 4), ' South ', 1), ((4, 5), ' West ', 1)]
+
     """
 
     def init():
-        stack = util.Stack()
-
         initial_node = Node(problem.getStartState(), None, 0, None)
+        stack = util.Stack()
         stack.push(initial_node)
         return stack
 
     def expand(curr_node, pushed):
         for s in problem.getSuccessors(curr_node.state):
-            pushed.push(make_succ_node(curr_node, s))
+            pushed.push(make_successor_node(curr_node, s))
 
     return search(problem, init, expand)
 
@@ -159,15 +148,14 @@ def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
 
     def init():
-        queue = util.Queue()
-
         initial_node = Node(problem.getStartState(), None, 0, None)
+        queue = util.Queue()
         queue.push(initial_node)
         return queue
 
     def expand(curr_node, pushed):
         for s in problem.getSuccessors(curr_node.state):
-            pushed.push(make_succ_node(curr_node, s))
+            pushed.push(make_successor_node(curr_node, s))
 
     return search(problem, init, expand)
 
@@ -176,17 +164,15 @@ def uniformCostSearch(problem):
     """Search the node of least total cost first."""
 
     def init():
+        initial_node = init_node(problem.getStartState())
         pq = util.PriorityQueue()
-        initial_node = make_initial_node(problem.getStartState())
         pq.push(initial_node, initial_node.cost)
-
         return pq
 
     def expand(curr_node, pq):
         for s in problem.getSuccessors(curr_node.state):
-            node = make_succ_node(curr_node, s)
-            # pq.push(node, node.cost)
-            cost = problem.getCostOfActions(getActionList(node))
+            node = make_successor_node(curr_node, s)
+            cost = problem.getCostOfActions(get_actions(node))
             pq.update(node, cost)
 
     return search(problem, init, expand)
@@ -204,17 +190,16 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
 
     def init():
+        initial_node = init_node(problem.getStartState())
         opened = util.PriorityQueue()
-        initial_node = make_initial_node(problem.getStartState())
-        opened.push(initial_node, initial_node.cost + heuristic(initial_node.state, problem))
+        opened.push(initial_node, 0)
         return opened
 
     def expand(curr_node, opened):
         for s in problem.getSuccessors(curr_node.state):
-            node = make_succ_node(curr_node, s)
-            g = problem.getCostOfActions(getActionList(node))
+            node = make_successor_node(curr_node, s)
+            g = problem.getCostOfActions(get_actions(node))
             h = heuristic(node.state, problem)
-            # opened.update(node, node.cost + heuristic(node.state, problem))
             opened.update(node, g + h)
 
     return search(problem, init, expand)

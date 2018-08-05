@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -37,7 +37,6 @@ Good luck and happy searching!
 from game import Directions
 from game import Agent
 from game import Actions
-from game import Configuration
 import util
 import time
 import search
@@ -277,6 +276,13 @@ def euclideanHeuristic(position, problem, info={}):
 # This portion is incomplete.  Time to write code!  #
 #####################################################
 
+
+def shortest_distance(state, start, goal):
+    """Get actual shortest distance between a and b"""
+    problem = PositionSearchProblem(state, start=start, goal=goal, warn=False)
+    return len(search.uniformCostSearch(problem))
+
+
 class CornersProblem(search.SearchProblem):
     """
     This search problem finds paths through all four corners of a layout.
@@ -295,24 +301,20 @@ class CornersProblem(search.SearchProblem):
         for corner in self.corners:
             if not startingGameState.hasFood(*corner):
                 print 'Warning: no food in corner ' + str(corner)
-        self._expanded = 0  # DO NOT CHANGE; Number of search nodes expanded
-        # Please add any code here which you would like to use
-        # in initializing the problem
-        self.startState = startingGameState
+        self._expanded = 0  # Number of search nodes expanded
 
     def getStartState(self):
-        """
-        Returns the start state (in your state space, not the full Pacman state
-        space)
-        """
-        # return self.startState
-        return self.startingPosition, frozenset()
+        "Returns the start state (in your state space, not the full Pacman state space)"
+
+        # Store visited corners in an array, and give the state as a tuple of
+        # the current state and the visited corners
+        visited = frozenset()
+        return self.startingPosition, visited
 
     def isGoalState(self, state):
-        """
-        Returns whether this search state is a goal state of the problem.
-        """
-        "*** YOUR CODE HERE ***"
+        "Returns whether this search state is a goal state of the problem"
+
+        # Corners are all visited if there are 4 elements in the corners array.
         return state[1] == set(self.corners)
 
     def getSuccessors(self, state):
@@ -320,42 +322,35 @@ class CornersProblem(search.SearchProblem):
         Returns successor states, the actions they require, and a cost of 1.
 
          As noted in search.py:
-            For a given state, this should return a list of triples, (successor,
-            action, stepCost), where 'successor' is a successor to the current
-            state, 'action' is the action required to get there, and 'stepCost'
-            is the incremental cost of expanding to that successor
+             For a given state, this should return a list of triples,
+         (successor, action, stepCost), where 'successor' is a
+         successor to the current state, 'action' is the action
+         required to get there, and 'stepCost' is the incremental
+         cost of expanding to that successor
         """
 
         successors = []
+        # currentPosition = state[0]
+
+        # For every direction from the current position, check to see if moving
+        # will hit a wall. If it doesn't, see if making the move would lead to
+        # a corner. If so, give that move as a possible successor, and update
+        # the visited corners to reflect that the corner is visited (if that
+        # move is mode). Otherwise, just update the position without changing
+        # the visited corners.
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
-            # Add a successor state to the successor list if the action is legal
-            # Here's a code snippet for figuring out whether a new position hits a wall:
-            #   x,y = currentPosition
-            #   dx, dy = Actions.directionToVector(action)
-            #   nextx, nexty = int(x + dx), int(y + dy)
-            #   hitsWall = self.walls[nextx][nexty]
-
-            "*** YOUR CODE HERE ***"
-            # x, y = state[0]
-            # dx, dy = Actions.directionToVector(action)
-            # nextx, nexty = int(x + dx), int(y + dy)
-            # hitsWall = self.walls[nextx][nexty]
-            # if not hitsWall:
-            #     # successor = Configuration((x + dx, y + dy), (dx, dy))
-            #     successors.append((successor, action, 1))
-
             x, y = state[0]
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
             hitsWall = self.walls[nextx][nexty]
-            if not hitsWall:
-                s = set(state[1])
-                # does the action lead to a corner?
-                if (nextx, nexty) in self.corners:
-                    s.add((nextx, nexty))
-                successors.append((((nextx, nexty), frozenset(s)), action, 1))
 
-        self._expanded += 1  # DO NOT CHANGE
+            if not hitsWall:
+                visited = set(state[1])
+                if (nextx, nexty) in self.corners:
+                    visited.add((nextx, nexty))
+                successors.append((((nextx, nexty), frozenset(visited)), action, 1))
+
+        self._expanded += 1
         return successors
 
     def getCostOfActions(self, actions):
@@ -381,15 +376,25 @@ def cornersHeuristic(state, problem):
 
       problem: The CornersProblem instance for this layout.
 
-    This function should always return a number that is a lower bound on the
-    shortest path from the state to a goal of the problem; i.e.  it should be
-    admissible (as well as consistent).
+    This function should always return a number that is a lower bound
+    on the shortest path from the state to a goal of the problem; i.e.
+    it should be admissible (as well as consistent).
     """
-    corners = problem.corners  # These are the corner coordinates
-    walls = problem.walls  # These are the walls of the maze, as a Grid (game.py)
 
-    "*** YOUR CODE HERE ***"
-    return 0  # Default to trivial solution
+    corners = problem.corners
+    walls = problem.walls
+    heuristic = 0
+    current_node = state[0]
+    visited = set(state[1])
+    unvisited = [c for c in corners if c not in visited]
+
+    while unvisited:
+        distance, corner = min([(util.manhattanDistance(current_node, corner), corner) for corner in unvisited])
+        heuristic += distance
+        current_node = corner
+        unvisited.remove(corner)
+
+    return heuristic
 
 
 class AStarCornersAgent(SearchAgent):
