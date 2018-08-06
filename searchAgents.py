@@ -280,12 +280,6 @@ def euclideanHeuristic(position, problem, info={}):
 #####################################################
 
 
-def shortest_distance(state, start, goal):
-    """Get actual shortest distance between a and b"""
-    problem = PositionSearchProblem(state, start=start, goal=goal, warn=False)
-    return len(search.uniformCostSearch(problem))
-
-
 class CornersProblem(search.SearchProblem):
     """
     This search problem finds paths through all four corners of a layout.
@@ -494,7 +488,13 @@ def foodHeuristic(state, problem):
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
 
-    return 0
+    food_list = foodGrid.asList()
+    if len(food_list) == 0:
+        return 0
+
+    heuristic = max([mazeDistance(position, food, problem.startingGameState) for food in food_list])
+
+    return heuristic
 
 
 class ClosestDotSearchAgent(SearchAgent):
@@ -527,7 +527,7 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return search.bfs(problem)
 
 
 class AnyFoodSearchProblem(PositionSearchProblem):
@@ -562,9 +562,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         complete the problem definition.
         """
         x, y = state
-
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return (x, y) in self.food.asList()
 
 
 def mazeDistance(point1, point2, gameState):

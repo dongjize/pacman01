@@ -74,43 +74,6 @@ def tinyMazeSearch(problem):
     return [s, s, w, s, w, w, s, w]
 
 
-class Node:
-    def __init__(self, state, action, cost, prev):
-        self.state = state
-        self.action = action
-        self.cost = cost
-        self.prev = prev
-
-
-def init_node(state):
-    return Node(state, None, 0, None)
-
-
-def make_successor(current_node, successor):
-    return Node(successor[0], successor[1], successor[2], current_node)
-
-
-def get_actions(node):
-    actions = []
-    while node.prev:
-        actions.append(node.action)
-        node = node.prev
-    return actions[::-1]
-
-
-def search(problem, init, expand):
-    closed = set()
-    opened = init()
-    while not opened.isEmpty():
-        node = opened.pop()
-        if problem.isGoalState(node.state):
-            return get_actions(node)
-        if node.state not in closed:
-            closed.add(node.state)
-            expand(node, opened)
-    return None
-
-
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
@@ -203,6 +166,43 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             pq.update(node, g + h)
 
     return search(problem, init, expand)
+
+
+class Node:
+    def __init__(self, state, action, cost, prev):
+        self.state = state
+        self.action = action
+        self.cost = cost
+        self.prev = prev
+
+
+def init_node(state):
+    return Node(state, None, 0, None)
+
+
+def make_successor(current_node, successor):
+    return Node(successor[0], successor[1], successor[2], current_node)
+
+
+def get_actions(node):
+    actions = []
+    while node.prev:
+        actions.append(node.action)
+        node = node.prev
+    return actions[::-1]
+
+
+def search(problem, init, expand):
+    closed = set()
+    opened = init()
+    while not opened.isEmpty():
+        node = opened.pop()
+        if problem.isGoalState(node.state):
+            return get_actions(node)
+        if node.state not in closed:
+            closed.add(node.state)
+            expand(node, opened)
+    return None
 
 
 # Abbreviations
