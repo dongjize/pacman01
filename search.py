@@ -176,12 +176,17 @@ class Node:
         self.prev = prev
 
 
-def init_node(state):
-    return Node(state, None, 0, None)
-
-
-def make_successor(current_node, successor):
-    return Node(successor[0], successor[1], successor[2], current_node)
+def search(problem, init, expand):
+    opened = init()
+    closed = set()
+    while not opened.isEmpty():
+        node = opened.pop()
+        if problem.isGoalState(node.state):
+            return get_actions(node)
+        if node.state not in closed:
+            closed.add(node.state)
+            expand(node, opened)
+    return None
 
 
 def get_actions(node):
@@ -192,17 +197,12 @@ def get_actions(node):
     return actions[::-1]
 
 
-def search(problem, init, expand):
-    closed = set()
-    opened = init()
-    while not opened.isEmpty():
-        node = opened.pop()
-        if problem.isGoalState(node.state):
-            return get_actions(node)
-        if node.state not in closed:
-            closed.add(node.state)
-            expand(node, opened)
-    return None
+def init_node(state):
+    return Node(state, None, 0, None)
+
+
+def make_successor(current_node, successor):
+    return Node(successor[0], successor[1], successor[2], current_node)
 
 
 # Abbreviations

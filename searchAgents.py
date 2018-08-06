@@ -303,15 +303,12 @@ class CornersProblem(search.SearchProblem):
     def getStartState(self):
         "Returns the start state (in your state space, not the full Pacman state space)"
 
-        # Store visited corners in an array, and give the state as a tuple of
-        # the current state and the visited corners
         visited = frozenset()
         return self.startingPosition, visited
 
     def isGoalState(self, state):
         "Returns whether this search state is a goal state of the problem"
 
-        # Corners are all visited if there are 4 elements in the corners array.
         return state[1] == set(self.corners)
 
     def getSuccessors(self, state):
@@ -338,7 +335,8 @@ class CornersProblem(search.SearchProblem):
                 visited = set(state[1])
                 if (nextx, nexty) in self.corners:
                     visited.add((nextx, nexty))
-                successors.append((((nextx, nexty), frozenset(visited)), action, 1))
+                succ_state = ((nextx, nexty), frozenset(visited))
+                successors.append((succ_state, action, 1))
 
         self._expanded += 1
         return successors
