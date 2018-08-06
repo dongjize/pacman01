@@ -86,7 +86,7 @@ def init_node(state):
     return Node(state, None, 0, None)
 
 
-def make_successor_node(current_node, successor):
+def make_successor(current_node, successor):
     return Node(successor[0], successor[1], successor[2], current_node)
 
 
@@ -137,9 +137,9 @@ def depthFirstSearch(problem):
         stack.push(initial_node)
         return stack
 
-    def expand(curr_node, pushed):
+    def expand(curr_node, stack):
         for s in problem.getSuccessors(curr_node.state):
-            pushed.push(make_successor_node(curr_node, s))
+            stack.push(make_successor(curr_node, s))
 
     return search(problem, init, expand)
 
@@ -153,9 +153,9 @@ def breadthFirstSearch(problem):
         queue.push(initial_node)
         return queue
 
-    def expand(curr_node, pushed):
+    def expand(curr_node, queue):
         for s in problem.getSuccessors(curr_node.state):
-            pushed.push(make_successor_node(curr_node, s))
+            queue.push(make_successor(curr_node, s))
 
     return search(problem, init, expand)
 
@@ -171,7 +171,7 @@ def uniformCostSearch(problem):
 
     def expand(curr_node, pq):
         for s in problem.getSuccessors(curr_node.state):
-            node = make_successor_node(curr_node, s)
+            node = make_successor(curr_node, s)
             cost = problem.getCostOfActions(get_actions(node))
             pq.update(node, cost)
 
@@ -195,12 +195,12 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         opened.push(initial_node, 0)
         return opened
 
-    def expand(curr_node, opened):
+    def expand(curr_node, pq):
         for s in problem.getSuccessors(curr_node.state):
-            node = make_successor_node(curr_node, s)
+            node = make_successor(curr_node, s)
             g = problem.getCostOfActions(get_actions(node))
             h = heuristic(node.state, problem)
-            opened.update(node, g + h)
+            pq.update(node, g + h)
 
     return search(problem, init, expand)
 
