@@ -378,9 +378,10 @@ def cornersHeuristic(state, problem):
     visited = set(state[1])
     unvisited = [c for c in corners if c not in visited]
 
+    # The heuristic here is the sum of shortest Manhattan distances to cover each corner
     while unvisited:
-        distance, corner = min([(util.manhattanDistance(current_node, corner), corner) for corner in unvisited])
-        heuristic += distance
+        dist, corner = min([(util.manhattanDistance(current_node, corner), corner) for corner in unvisited])
+        heuristic += dist
         current_node = corner
         unvisited.remove(corner)
 
@@ -490,6 +491,7 @@ def foodHeuristic(state, problem):
     if len(food_list) == 0:
         return 0
 
+    # Make use of the given method mazeDistance - the distance to the farthest food is regarded as the heuristic.
     heuristic = max([mazeDistance(position, food, problem.startingGameState) for food in food_list])
 
     return heuristic
@@ -525,6 +527,7 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
+        # Search the closest food with the implemented breadth first search
         return search.bfs(problem)
 
 
@@ -560,6 +563,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         complete the problem definition.
         """
         x, y = state
+        # If current position is in food positions, then food is found
         return (x, y) in self.food.asList()
 
 
