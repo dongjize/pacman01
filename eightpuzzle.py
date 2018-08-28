@@ -214,9 +214,9 @@ class EightPuzzleSearchProblem(search.SearchProblem):
 
     def getCostOfActions(self, actions):
         """
-         actions: A list of actions to take
+         get_actions: A list of get_actions to take
 
-        This method returns the total cost of a particular sequence of actions.  The sequence must
+        This method returns the total cost of a particular sequence of get_actions.  The sequence must
         be composed of legal moves
         """
         return len(actions)

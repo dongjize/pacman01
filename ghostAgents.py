@@ -31,7 +31,7 @@ class GhostAgent( Agent ):
             return util.chooseFromDistribution( dist )
 
     def getDistribution(self, state):
-        "Returns a Counter encoding a distribution over actions from the provided state."
+        "Returns a Counter encoding a distribution over get_actions from the provided state."
         util.raiseNotDefined()
 
 class RandomGhost( GhostAgent ):

@@ -20,7 +20,7 @@ are expanded.
 # The graph is specified by first the set of start states, followed by
 # the set of goal states, and lastly by the state transitions which are
 # of the form: 
-#      <start state> <actions> <end state> <cost>
+#      <start state> <get_actions> <end state> <cost>
 graph: """
 start_state: A
 goal_states: G

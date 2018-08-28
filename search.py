@@ -55,9 +55,9 @@ class SearchProblem:
 
     def getCostOfActions(self, actions):
         """
-         actions: A list of actions to take
+         get_actions: A list of get_actions to take
 
-        This method returns the total cost of a particular sequence of actions.
+        This method returns the total cost of a particular sequence of get_actions.
         The sequence must be composed of legal moves.
         """
         util.raiseNotDefined()
@@ -74,11 +74,32 @@ def tinyMazeSearch(problem):
     return [s, s, w, s, w, w, s, w]
 
 
+def search(problem, start, expand):
+    """
+    The generic search method used in dfs, bfs, ucs and A* search
+
+    :param problem: the generic search problem
+    :param start: the method handle for initializing the first node
+    :param expand: the method handle for expanding the fringe
+    :return: returns a list of get_actions to go when reaching the goal state
+    """
+    fringe = start()
+    closed = set()
+    while not fringe.isEmpty():
+        node = fringe.pop()
+        if problem.isGoalState(node.state):
+            return get_actions(node)
+        if node.state not in closed:
+            closed.add(node.state)
+            expand(node, fringe)
+    return None
+
+
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
 
-    Your search algorithm needs to return a list of actions that reaches the
+    Your search algorithm needs to return a list of get_actions that reaches the
     goal. Make sure to implement a graph search algorithm.
 
     To get started, you might want to try some of these simple commands to
@@ -88,57 +109,64 @@ def depthFirstSearch(problem):
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
 
-    Start: (5, 5)
-    Is the start a goal? False
-    Start 's successors: [((5, 4), ' South ', 1), ((4, 5), ' West ', 1)]
+    - Start: (5, 5)
+    - Is the start a goal? False
+    - Start 's successors: [((5, 4), ' South ', 1), ((4, 5), ' West ', 1)]
 
     """
 
-    def init():
-        initial_node = Node(problem.getStartState(), None, 0, None)
-        fringe = util.Stack()
-        fringe.push(initial_node)
-        return fringe
+    """*** Q1 ***"""
 
-    def expand(curr_node, fringe):
+    def start():
+        node0 = Node(problem.getStartState(), None, 0, None)
+        stack = util.Stack()
+        stack.push(node0)
+        return stack
+
+    def expand(curr_node, stack):
         for s in problem.getSuccessors(curr_node.state):
-            fringe.push(gen_successor(curr_node, s))
+            stack.push(gen_successor(curr_node, s))
 
-    return search(problem, init, expand)
+    return search(problem, start, expand)
 
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
 
-    def init():
-        initial_node = Node(problem.getStartState(), None, 0, None)
-        fringe = util.Queue()
-        fringe.push(initial_node)
-        return fringe
+    """*** Q2 ***"""
 
-    def expand(curr_node, fringe):
+    def start():
+        node0 = Node(problem.getStartState(), None, 0, None)
+        queue = util.Queue()
+        queue.push(node0)
+        return queue
+
+    def expand(curr_node, stack):
         for s in problem.getSuccessors(curr_node.state):
-            fringe.push(gen_successor(curr_node, s))
+            stack.push(gen_successor(curr_node, s))
 
-    return search(problem, init, expand)
+    return search(problem, start, expand)
 
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
 
-    def init():
-        initial_node = init_node(problem.getStartState())
-        fringe = util.PriorityQueue()
-        fringe.push(initial_node, initial_node.cost)
-        return fringe
+    """*** Q3 ***"""
 
-    def expand(curr_node, fringe):
+    def start():
+        node0 = init_node(problem.getStartState())
+        pq = util.PriorityQueue()
+        pq.push(node0, node0.cost)
+        return pq
+
+    def expand(curr_node, pq):
         for s in problem.getSuccessors(curr_node.state):
             successor = gen_successor(curr_node, s)
-            cost = problem.getCostOfActions(get_actions(successor))
-            fringe.update(successor, cost)
+            actions = get_actions(successor)
+            cost = problem.getCostOfActions(actions)
+            pq.update(successor, cost)
 
-    return search(problem, init, expand)
+    return search(problem, start, expand)
 
 
 def nullHeuristic(state, problem=None):
@@ -152,57 +180,70 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
 
-    def init():
-        initial_node = init_node(problem.getStartState())
-        opened = util.PriorityQueue()
-        opened.push(initial_node, 0)
-        return opened
+    """*** Q4 ***"""
 
-    def expand(curr_node, fringe):
+    def start():
+        node0 = init_node(problem.getStartState())
+        pq = util.PriorityQueue()
+        pq.push(node0, 0)
+        return pq
+
+    def expand(curr_node, pq):
         for s in problem.getSuccessors(curr_node.state):
             node = gen_successor(curr_node, s)
-            g = problem.getCostOfActions(get_actions(node))
-            h = heuristic(node.state, problem)
-            fringe.update(node, g + h)
+            actions = get_actions(node)
+            g = problem.getCostOfActions(actions)  # the total cost of visited nodes
+            h = heuristic(node.state, problem)  # the heuristic of unvisited nodes
+            pq.update(node, g + h)
 
-    return search(problem, init, expand)
+    return search(problem, start, expand)
 
 
 class Node:
-    def __init__(self, state, action, cost, prev):
+
+    def __init__(self, state, prev, cost, action):
+        """
+        :param state: contains all necessary information of the node (e.g. coordinates, whether reaches the goal)
+        :param action: the required action to reach from the previous node
+        :param cost: the cost for reaching from the previous node (always 1 in the project)
+        :param prev: the previous node
+        """
         self.state = state
+        self.prev = prev
         self.action = action
         self.cost = cost
-        self.prev = prev
-
-
-def search(problem, init, expand):
-    fringe = init()
-    closed = set()
-    while not fringe.isEmpty():
-        node = fringe.pop()
-        if problem.isGoalState(node.state):
-            return get_actions(node)
-        if node.state not in closed:
-            closed.add(node.state)
-            expand(node, fringe)
-    return None
 
 
 def get_actions(node):
-    actions = []
+    """
+    Iteratively get the get_actions to reach the current node
+    :param node: the current node
+    :return: the action list to reach the current node
+    """
+    actions_list = []
     while node.prev:
-        actions.append(node.action)
+        actions_list.append(node.action)
         node = node.prev
-    return actions[::-1]
+    return actions_list[::-1]
 
 
 def init_node(state):
+    """
+    generate the first node of a group of nodes
+    :param state:
+    :return: the start node
+    """
     return Node(state, None, 0, None)
 
 
-def gen_successor(current_node, successor):
-    return Node(successor[0], successor[1], successor[2], current_node)
+def gen_successor(node, s):
+    """
+    generate the successor of current node
+    :param node: the current node
+    :param s: a triple of the successor's information (nextState, action, cost)
+    :return: the successor node
+    """
+    return Node(s[0], node, s[2], s[1])
 
 
 # Abbreviations

@@ -154,7 +154,7 @@ ERROR_HINT_MAP = {
       We noticed that your project threw an IndexError on q1.
       While many things may cause this, it may have been from
       assuming a certain number of successors from a state space
-      or assuming a certain number of actions available from a given
+      or assuming a certain number of get_actions available from a given
       state. Try making your code more general (no hardcoded indices)
       and submit again!
     """

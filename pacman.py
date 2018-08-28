@@ -84,7 +84,7 @@ class GameState:
 
     def getLegalActions(self, agentIndex=0):
         """
-        Returns the legal actions for the agent specified.
+        Returns the legal get_actions for the agent specified.
         """
         #        GameState.explored.add(self)
         if self.isWin() or self.isLose(): return []
@@ -336,7 +336,7 @@ class PacmanRules:
 
     def getLegalActions(state):
         """
-        Returns a list of possible actions.
+        Returns a list of possible get_actions.
         """
         return Actions.getPossibleActions(state.getPacmanState().configuration, state.data.layout.walls)
 
@@ -677,7 +677,7 @@ def runGames(layout, pacman, ghosts, display, numGames, record, numTraining=0, c
             import time, cPickle
             fname = ('recorded-game-%d' % (i + 1)) + '-'.join([str(t) for t in time.localtime()[1:6]])
             f = file(fname, 'w')
-            components = {'layout': layout, 'actions': game.moveHistory}
+            components = {'layout': layout, 'get_actions': game.moveHistory}
             cPickle.dump(components, f)
             f.close()
 

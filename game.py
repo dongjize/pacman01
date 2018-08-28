@@ -295,7 +295,7 @@ def reconstituteGrid(bitRep):
 
 class Actions:
     """
-    A collection of static methods for manipulating move actions.
+    A collection of static methods for manipulating move get_actions.
     """
     # Directions
     _directions = {Directions.NORTH: (0, 1),
@@ -534,7 +534,7 @@ except:
 
 class Game:
     """
-    The Game manages the control flow, soliciting actions from agents.
+    The Game manages the control flow, soliciting get_actions from agents.
     """
 
     def __init__(self, agents, display, rules, startingIndex=0, muteAgents=False, catchExceptions=False):

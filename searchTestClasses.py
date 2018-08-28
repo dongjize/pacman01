@@ -107,7 +107,7 @@ class GraphSearch(SearchProblem):
         self.expanded_states.append(state)
         return list(self.successors[state])
 
-    # Calculate total cost of a sequence of actions
+    # Calculate total cost of a sequence of get_actions
     def getCostOfActions(self, actions):
         total_cost = 0
         state = self.start_state
@@ -291,7 +291,7 @@ class PacmanSearchTest(testClasses.TestCase):
         from game import Directions
         dirs = Directions.LEFT.keys()
         if [el in dirs for el in solution].count(False) != 0:
-            return None, None, 'Output of %s must be a list of actions from game.Directions' % self.alg
+            return None, None, 'Output of %s must be a list of get_actions from game.Directions' % self.alg
 
         expanded = problem._expanded
         return solution, expanded, None
