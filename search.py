@@ -74,9 +74,9 @@ def tinyMazeSearch(problem):
     return [s, s, w, s, w, w, s, w]
 
 
-def search(problem, start, expand):
+def execute(problem, start, expand):
     """
-    The generic search method used in dfs, bfs, ucs and A* search
+    The generic search method executing dfs, bfs, ucs and A* search
 
     :param problem: the generic search problem
     :param start: the method handle for initializing the first node
@@ -93,6 +93,19 @@ def search(problem, start, expand):
             closed.add(node.state)
             expand(node, fringe)
     return None
+
+
+def get_actions(node):
+    """
+    Iteratively get the get_actions to reach the current node
+    :param node: the current node
+    :return: the action list to reach the current node
+    """
+    actions = []
+    while node.prev:
+        actions.insert(0, node.action)
+        node = node.prev
+    return actions
 
 
 def depthFirstSearch(problem):
@@ -127,7 +140,7 @@ def depthFirstSearch(problem):
         for s in problem.getSuccessors(curr_node.state):
             stack.push(gen_successor(curr_node, s))
 
-    return search(problem, start, expand)
+    return execute(problem, start, expand)
 
 
 def breadthFirstSearch(problem):
@@ -141,11 +154,11 @@ def breadthFirstSearch(problem):
         queue.push(node0)
         return queue
 
-    def expand(curr_node, stack):
+    def expand(curr_node, queue):
         for s in problem.getSuccessors(curr_node.state):
-            stack.push(gen_successor(curr_node, s))
+            queue.push(gen_successor(curr_node, s))
 
-    return search(problem, start, expand)
+    return execute(problem, start, expand)
 
 
 def uniformCostSearch(problem):
@@ -166,7 +179,7 @@ def uniformCostSearch(problem):
             cost = problem.getCostOfActions(actions)
             pq.update(successor, cost)
 
-    return search(problem, start, expand)
+    return execute(problem, start, expand)
 
 
 def nullHeuristic(state, problem=None):
@@ -196,7 +209,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             h = heuristic(node.state, problem)  # the heuristic of unvisited nodes
             pq.update(node, g + h)
 
-    return search(problem, start, expand)
+    return execute(problem, start, expand)
 
 
 class Node:
@@ -204,27 +217,14 @@ class Node:
     def __init__(self, state, prev, cost, action):
         """
         :param state: contains all necessary information of the node (e.g. coordinates, whether reaches the goal)
+        :param prev: the previous node
         :param action: the required action to reach from the previous node
         :param cost: the cost for reaching from the previous node (always 1 in the project)
-        :param prev: the previous node
         """
         self.state = state
         self.prev = prev
         self.action = action
         self.cost = cost
-
-
-def get_actions(node):
-    """
-    Iteratively get the get_actions to reach the current node
-    :param node: the current node
-    :return: the action list to reach the current node
-    """
-    actions_list = []
-    while node.prev:
-        actions_list.append(node.action)
-        node = node.prev
-    return actions_list[::-1]
 
 
 def init_node(state):
