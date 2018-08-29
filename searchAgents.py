@@ -329,6 +329,8 @@ class CornersProblem(search.SearchProblem):
 
         successors = []
 
+        # For all the directions, if the next node isn't a wall, add it to the successors list
+
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             x, y = state[0]
             dx, dy = Actions.directionToVector(action)
@@ -386,9 +388,10 @@ def cornersHeuristic(state, problem):
     unvisited_corners = [corner for corner in corners if corner not in visited_corners]
 
     # Here the heuristic is the smallest sum of Manhattan distances to cover each corner.
+    # Admissible because Manhattan distance is the shortest possible way to go
     while unvisited_corners:
-        dist, corner = min([(util.manhattanDistance(current_node, corner), corner) for corner in unvisited_corners])
-        heuristic += dist
+        distance, corner = min([(util.manhattanDistance(current_node, corner), corner) for corner in unvisited_corners])
+        heuristic += distance
         current_node = corner
         unvisited_corners.remove(corner)
 
@@ -497,8 +500,9 @@ def foodHeuristic(state, problem):
     if len(foodGrid.asList()) == 0:
         return 0
 
-    # Make use of the given method mazeDistance - the distance to the farthest food is regarded as the heuristic.
-    return max([mazeDistance(position, food, problem.startingGameState) for food in foodGrid.asList()])
+    # Make use of the given mazeDistance method - the distance to the farthest food is regarded as the heuristic.
+    h = max([mazeDistance(position, food, problem.startingGameState) for food in foodGrid.asList()])
+    return h
 
 
 class ClosestDotSearchAgent(SearchAgent):

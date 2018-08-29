@@ -92,7 +92,6 @@ def execute(problem, start, expand):
         if node.state not in closed:
             closed.add(node.state)
             expand(node, fringe)
-    return None
 
 
 def get_actions(node):
@@ -138,7 +137,8 @@ def depthFirstSearch(problem):
 
     def expand(curr_node, stack):
         for s in problem.getSuccessors(curr_node.state):
-            stack.push(gen_successor(curr_node, s))
+            successor = Node(s[0], curr_node, s[2], s[1])
+            stack.push(successor)
 
     return execute(problem, start, expand)
 
@@ -156,7 +156,8 @@ def breadthFirstSearch(problem):
 
     def expand(curr_node, queue):
         for s in problem.getSuccessors(curr_node.state):
-            queue.push(gen_successor(curr_node, s))
+            successor = Node(s[0], curr_node, s[2], s[1])
+            queue.push(successor)
 
     return execute(problem, start, expand)
 
@@ -167,14 +168,14 @@ def uniformCostSearch(problem):
     """*** Q3 ***"""
 
     def start():
-        node0 = init_node(problem.getStartState())
+        node0 = Node(problem.getStartState(), None, 0, None)
         pq = util.PriorityQueue()
         pq.push(node0, node0.cost)
         return pq
 
     def expand(curr_node, pq):
         for s in problem.getSuccessors(curr_node.state):
-            successor = gen_successor(curr_node, s)
+            successor = Node(s[0], curr_node, s[2], s[1])
             actions = get_actions(successor)
             cost = problem.getCostOfActions(actions)
             pq.update(successor, cost)
@@ -196,18 +197,18 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     """*** Q4 ***"""
 
     def start():
-        node0 = init_node(problem.getStartState())
+        node0 = Node(problem.getStartState(), None, 0, None)
         pq = util.PriorityQueue()
         pq.push(node0, 0)
         return pq
 
     def expand(curr_node, pq):
         for s in problem.getSuccessors(curr_node.state):
-            node = gen_successor(curr_node, s)
-            actions = get_actions(node)
+            successor = Node(s[0], curr_node, s[2], s[1])
+            actions = get_actions(successor)
             g = problem.getCostOfActions(actions)  # the total cost of visited nodes
-            h = heuristic(node.state, problem)  # the heuristic of unvisited nodes
-            pq.update(node, g + h)
+            h = heuristic(successor.state, problem)  # the heuristic of unvisited nodes
+            pq.update(successor, g + h)
 
     return execute(problem, start, expand)
 
@@ -225,25 +226,6 @@ class Node:
         self.prev = prev
         self.action = action
         self.cost = cost
-
-
-def init_node(state):
-    """
-    generate the first node of a group of nodes
-    :param state:
-    :return: the start node
-    """
-    return Node(state, None, 0, None)
-
-
-def gen_successor(node, s):
-    """
-    generate the successor of current node
-    :param node: the current node
-    :param s: a triple of the successor's information (nextState, action, cost)
-    :return: the successor node
-    """
-    return Node(s[0], node, s[2], s[1])
 
 
 # Abbreviations
