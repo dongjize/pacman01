@@ -382,7 +382,7 @@ def cornersHeuristic(state, problem):
 
     corners = problem.corners
     walls = problem.walls
-    heuristic = 0
+    h = 0
     current_node = state[0]
     visited_corners = set(state[1])
     unvisited_corners = [corner for corner in corners if corner not in visited_corners]
@@ -390,12 +390,12 @@ def cornersHeuristic(state, problem):
     # Here the heuristic is the smallest sum of Manhattan distances to cover each corner.
     # Admissible because Manhattan distance is the shortest possible way to go
     while unvisited_corners:
-        distance, corner = min([(util.manhattanDistance(current_node, corner), corner) for corner in unvisited_corners])
-        heuristic += distance
+        min_dist, corner = min([(util.manhattanDistance(current_node, corner), corner) for corner in unvisited_corners])
+        h += min_dist
         current_node = corner
         unvisited_corners.remove(corner)
 
-    return heuristic
+    return h
 
 
 class AStarCornersAgent(SearchAgent):

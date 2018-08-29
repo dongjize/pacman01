@@ -129,18 +129,22 @@ def depthFirstSearch(problem):
 
     """*** Q1 ***"""
 
-    def start():
-        node0 = Node(problem.getStartState(), None, 0, None)
-        stack = util.Stack()
-        stack.push(node0)
-        return stack
-
     def expand(curr_node, stack):
         for s in problem.getSuccessors(curr_node.state):
             successor = Node(s[0], curr_node, s[2], s[1])
             stack.push(successor)
 
-    return execute(problem, start, expand)
+    node0 = Node(problem.getStartState(), None, 0, None)
+    stack = util.Stack()
+    stack.push(node0)
+    closed = set()
+    while not stack.isEmpty():
+        node = stack.pop()
+        if problem.isGoalState(node.state):
+            return get_actions(node)
+        if node.state not in closed:
+            closed.add(node.state)
+            expand(node, stack)
 
 
 def breadthFirstSearch(problem):
@@ -148,30 +152,30 @@ def breadthFirstSearch(problem):
 
     """*** Q2 ***"""
 
-    def start():
-        node0 = Node(problem.getStartState(), None, 0, None)
-        queue = util.Queue()
-        queue.push(node0)
-        return queue
-
     def expand(curr_node, queue):
         for s in problem.getSuccessors(curr_node.state):
             successor = Node(s[0], curr_node, s[2], s[1])
             queue.push(successor)
 
-    return execute(problem, start, expand)
+    node0 = Node(problem.getStartState(), None, 0, None)
+    queue = util.Queue()
+    queue.push(node0)
+    closed = set()
+    while not queue.isEmpty():
+        node = queue.pop()
+        if problem.isGoalState(node.state):
+            return get_actions(node)
+        if node.state not in closed:
+            closed.add(node.state)
+            expand(node, queue)
+
+    # return execute(problem, start, expand)
 
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
 
     """*** Q3 ***"""
-
-    def start():
-        node0 = Node(problem.getStartState(), None, 0, None)
-        pq = util.PriorityQueue()
-        pq.push(node0, node0.cost)
-        return pq
 
     def expand(curr_node, pq):
         for s in problem.getSuccessors(curr_node.state):
@@ -180,7 +184,17 @@ def uniformCostSearch(problem):
             cost = problem.getCostOfActions(actions)
             pq.update(successor, cost)
 
-    return execute(problem, start, expand)
+    node0 = Node(problem.getStartState(), None, 0, None)
+    pq = util.PriorityQueue()
+    pq.push(node0, node0.cost)
+    closed = set()
+    while not pq.isEmpty():
+        node = pq.pop()
+        if problem.isGoalState(node.state):
+            return get_actions(node)
+        if node.state not in closed:
+            closed.add(node.state)
+            expand(node, pq)
 
 
 def nullHeuristic(state, problem=None):
@@ -196,12 +210,6 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
     """*** Q4 ***"""
 
-    def start():
-        node0 = Node(problem.getStartState(), None, 0, None)
-        pq = util.PriorityQueue()
-        pq.push(node0, 0)
-        return pq
-
     def expand(curr_node, pq):
         for s in problem.getSuccessors(curr_node.state):
             successor = Node(s[0], curr_node, s[2], s[1])
@@ -210,7 +218,17 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             h = heuristic(successor.state, problem)  # the heuristic of unvisited nodes
             pq.update(successor, g + h)
 
-    return execute(problem, start, expand)
+    node0 = Node(problem.getStartState(), None, 0, None)
+    pq = util.PriorityQueue()
+    pq.push(node0, 0)
+    closed = set()
+    while not pq.isEmpty():
+        node = pq.pop()
+        if problem.isGoalState(node.state):
+            return get_actions(node)
+        if node.state not in closed:
+            closed.add(node.state)
+            expand(node, pq)
 
 
 class Node:
